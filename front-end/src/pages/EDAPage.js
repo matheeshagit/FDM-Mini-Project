@@ -9,7 +9,9 @@ function formatCount(value) {
 function getTooltipPosition(event, container, anchorBottom = false) {
   const bounds = container.getBoundingClientRect();
   const targetBounds = event.currentTarget.getBoundingClientRect();
-  const hasPointerPosition = event.clientX !== 0 || event.clientY !== 0;
+  const hasPointerPosition = Number.isFinite(event.clientX)
+    && Number.isFinite(event.clientY)
+    && (event.clientX !== 0 || event.clientY !== 0);
   const pointerX = hasPointerPosition ? event.clientX : targetBounds.left + targetBounds.width / 2;
   const pointerY = hasPointerPosition ? event.clientY : targetBounds.top + targetBounds.height / 2;
   const tooltipWidth = Math.min(212, bounds.width - 16);
@@ -55,7 +57,7 @@ function FeaturePieChart({ bins, label }) {
   const chartRef = useRef(null);
   const [tooltip, setTooltip] = useState(null);
   const total = bins.reduce((sum, { count }) => sum + count, 0);
-  const colors = ['#1e3a8a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'];
+  const colors = ['#0047ab', '#1a2c5b', '#afdbf5', '#5b93d1', '#80b8e0', '#d7eefc'];
   let angle = 0;
   const slices = bins.map((bin, index) => {
     const percent = total ? (bin.count / total) * 100 : 0;
@@ -132,23 +134,49 @@ function DatasetOverview({ overview }) {
 }
 
 function TargetDistribution({ target }) {
+  const chartRef = useRef(null);
+  const [tooltip, setTooltip] = useState(null);
+
   return (
-    <div className="eda-target-list" aria-label="Readmission outcome distribution">
-      {target.map(({ value, label, count, percent }) => (
-        <div className="eda-target-row" key={value} title={`${label}: ${formatCount(count)} encounters (${percent}%)`}>
-          <div className="eda-target-copy">
-            <span>{label}</span>
-            <strong>{formatCount(count)} <small>({percent}%)</small></strong>
+    <div
+      className="eda-target-list"
+      ref={chartRef}
+      aria-label="Readmission outcome distribution"
+      onMouseLeave={() => setTooltip(null)}
+    >
+      {target.map(({ value, label, count, percent }) => {
+        const showTooltip = (event) => setTooltip({
+          position: getTooltipPosition(event, chartRef.current, true),
+          details: {
+            title: label,
+            value: `${formatCount(count)} encounters`,
+            note: `${percent}% of readmission records`
+          }
+        });
+
+        return (
+          <div className="eda-target-row" key={value}>
+            <div className="eda-target-copy">
+              <span>{label}</span>
+              <strong>{formatCount(count)} <small>({percent}%)</small></strong>
+            </div>
+            <div
+              className="eda-target-track"
+              role="img"
+              tabIndex="0"
+              aria-label={`${label}: ${formatCount(count)} encounters, ${percent}%`}
+              onMouseEnter={showTooltip}
+              onMouseMove={showTooltip}
+              onMouseLeave={() => setTooltip(null)}
+              onFocus={showTooltip}
+              onBlur={() => setTooltip(null)}
+            >
+              <span style={{ width: `${percent}%` }} />
+            </div>
           </div>
-          <div
-            className="eda-target-track"
-            role="img"
-            aria-label={`${label}: ${formatCount(count)} encounters, ${percent}%`}
-          >
-            <span style={{ width: `${percent}%` }} />
-          </div>
-        </div>
-      ))}
+        );
+      })}
+      {tooltip && <ChartTooltip details={tooltip.details} position={tooltip.position} />}
     </div>
   );
 }

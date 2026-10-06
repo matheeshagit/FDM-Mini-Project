@@ -86,7 +86,7 @@
   border: 1px solid var(--line);
   border-radius: 10px;
   background: var(--paper);
-  box-shadow: 0 5px 16px rgba(30, 58, 138, 0.035);
+  box-shadow: 0 5px 16px rgba(26, 44, 91, 0.06);
 }
 
 .eda-overview-card {
@@ -149,6 +149,7 @@
 }
 
 .eda-target-list {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -161,7 +162,7 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 6px;
-  color: #475569;
+  color: var(--muted);
   font-size: 11px;
   line-height: 1.35;
 }
@@ -188,7 +189,8 @@
   height: 10px;
   overflow: hidden;
   border-radius: 99px;
-  background: #f1f5f9;
+  background: #eaf5fd;
+  cursor: pointer;
 }
 
 .eda-target-track > span {
@@ -201,6 +203,11 @@
 
 .eda-target-track:hover > span {
   filter: brightness(1.16);
+}
+
+.eda-target-track:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
 }
 
 .eda-panel-note {
@@ -262,7 +269,7 @@
   width: min(100%, 190px);
   aspect-ratio: 1;
   overflow: visible;
-  filter: drop-shadow(0 4px 7px rgba(15, 23, 42, 0.12));
+  filter: drop-shadow(0 4px 7px rgba(26, 44, 91, 0.12));
 }
 
 .eda-pie-slice {
@@ -289,8 +296,8 @@
   padding: 10px 12px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 8px;
-  background: #0f172a;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.22);
+  background: #1a2c5b;
+  box-shadow: 0 8px 22px rgba(26, 44, 91, 0.24);
   color: #ffffff;
   pointer-events: none;
   animation: eda-tooltip-in 100ms ease-out;
@@ -312,7 +319,7 @@
 }
 
 .eda-chart-tooltip small {
-  color: #cbd5e1;
+  color: #afdbf5;
   font-size: 10px;
   line-height: 1.4;
 }
@@ -345,7 +352,7 @@
   grid-template-columns: 9px minmax(0, 1fr) auto;
   align-items: center;
   gap: 7px;
-  color: #475569;
+  color: var(--muted);
   font-size: 11px;
 }
 
@@ -418,69 +425,69 @@
 }
 
 .eda-chart-gridline {
-  stroke: #e2e8f0;
+  stroke: var(--line);
   stroke-dasharray: 3 4;
   stroke-width: 1;
 }
 
 .eda-chart-axis {
-  stroke: #94a3b8;
+  stroke: #80b8e0;
   stroke-width: 1;
 }
 
 .eda-chart-tick,
 .eda-chart-axis-label {
-  fill: #64748b;
+  fill: var(--muted);
   font-family: 'Segoe UI', sans-serif;
   font-size: 10px;
 }
 
 .eda-chart-axis-label {
-  fill: #475569;
+  fill: var(--navy);
   font-size: 11px;
   font-weight: 600;
 }
 
 .eda-histogram-bar {
-  fill: #1e3a8a;
+  fill: #0047ab;
   opacity: 0.88;
   transition: opacity 160ms ease;
 }
 
 .eda-histogram-bar:hover {
-  fill: #334155;
+  fill: #1a2c5b;
   opacity: 1;
-  stroke: #0f172a;
+  stroke: #1a2c5b;
   stroke-width: 1.5;
 }
 
 .eda-histogram-bar:focus-visible {
-  fill: #334155;
+  fill: #1a2c5b;
   opacity: 1;
-  stroke: #0f172a;
+  stroke: #1a2c5b;
   stroke-width: 2;
   outline: none;
 }
 
 .eda-boxplot-whisker,
 .eda-boxplot-cap {
-  stroke: #1e3a8a;
+  stroke: #0047ab;
   stroke-width: 2;
 }
 
 .eda-boxplot-box {
-  fill: rgba(30, 58, 138, 0.16);
-  stroke: #1e3a8a;
+  fill: rgba(175, 219, 245, 0.75);
+  stroke: #0047ab;
   stroke-width: 2;
 }
 
 .eda-boxplot-median {
-  stroke: #0f172a;
+  stroke: #1a2c5b;
   stroke-width: 3;
 }
 
 .eda-boxplot-outlier {
-  fill: #0f172a;
+  fill: #1a2c5b;
   fill-opacity: 0.5;
   stroke: #ffffff;
   stroke-width: 0.65;
@@ -526,7 +533,7 @@
 .eda-insights li {
   position: relative;
   padding-left: 17px;
-  color: #475569;
+  color: var(--muted);
   font-size: 12px;
   line-height: 1.55;
 }

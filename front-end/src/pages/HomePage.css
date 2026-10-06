@@ -22,7 +22,7 @@
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--paper);
-  box-shadow: 0 12px 34px rgba(30, 58, 138, 0.06);
+  box-shadow: 0 12px 34px rgba(26, 44, 91, 0.08);
 }
 
 .home-hero-copy {
@@ -63,7 +63,7 @@
   border: 0;
   border-radius: 7px;
   background: var(--blue);
-  box-shadow: 0 5px 12px rgba(30, 58, 138, 0.16);
+  box-shadow: 0 5px 12px rgba(0, 71, 171, 0.18);
   color: #ffffff;
   cursor: pointer;
   font-weight: 700;
@@ -73,7 +73,7 @@
 .home-primary-button:hover {
   transform: translateY(-1px);
   background: var(--blue-deep);
-  box-shadow: 0 8px 16px rgba(30, 58, 138, 0.22);
+  box-shadow: 0 8px 16px rgba(0, 71, 171, 0.24);
 }
 
 .home-primary-button:active {
@@ -82,7 +82,7 @@
 
 .home-primary-button:focus-visible,
 .home-feature-card--action:focus-visible {
-  outline: 3px solid rgba(30, 58, 138, 0.3);
+  outline: 3px solid rgba(0, 71, 171, 0.3);
   outline-offset: 3px;
 }
 
@@ -99,7 +99,7 @@
   place-items: center;
   border: 1px solid var(--line);
   border-radius: 50%;
-  background: #f8fafc;
+  background: #eaf5fd;
   color: var(--blue);
 }
 
@@ -162,8 +162,8 @@
 
 .home-feature-card--action:hover {
   transform: translateY(-3px);
-  border-color: #b8c8d2;
-  box-shadow: 0 8px 20px rgba(30, 58, 138, 0.08);
+  border-color: #80b8e0;
+  box-shadow: 0 8px 20px rgba(26, 44, 91, 0.1);
 }
 
 .home-feature-icon {
