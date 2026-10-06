@@ -9,6 +9,7 @@ const navigationItems = [
 
 function Sidebar({ activePage, onNavigate }) {
   const [mobileExpanded, setMobileExpanded] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   function handleNavigate(page) {
     onNavigate(page);
@@ -16,12 +17,21 @@ function Sidebar({ activePage, onNavigate }) {
   }
 
   return (
-    <aside className={`dashboard-sidebar${mobileExpanded ? ' dashboard-sidebar--expanded' : ''}`}>
+    <aside className={`dashboard-sidebar${mobileExpanded ? ' dashboard-sidebar--expanded' : ''}${collapsed ? ' dashboard-sidebar--collapsed' : ''}`}>
       <div className="sidebar-heading">
         <div className="sidebar-brand">
           <span className="sidebar-brand-mark" aria-hidden="true">+</span>
-          <span>Care<span className="sidebar-brand-accent">AI</span></span>
+          <span className="sidebar-brand-name">Care<span className="sidebar-brand-accent">AI</span></span>
         </div>
+        <button
+          className="sidebar-collapse-toggle"
+          type="button"
+          aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+          aria-expanded={!collapsed}
+          onClick={() => setCollapsed((isCollapsed) => !isCollapsed)}
+        >
+          {collapsed ? '›' : '‹'}
+        </button>
         <button
           className="sidebar-toggle"
           type="button"
@@ -41,10 +51,12 @@ function Sidebar({ activePage, onNavigate }) {
             type="button"
             key={id}
             aria-current={activePage === id ? 'page' : undefined}
+            title={collapsed ? label : undefined}
+            aria-label={label}
             onClick={() => handleNavigate(id)}
           >
             <span className="sidebar-nav-icon" aria-hidden="true">{icon}</span>
-            <span>{label}</span>
+            <span className="sidebar-nav-label">{label}</span>
           </button>
         ))}
       </nav>
