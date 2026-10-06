@@ -16,9 +16,18 @@ function PredictionForm({ values, onChange, onSubmit, onClear, loading }) {
           <div className="field-grid">
             {group.fields.map((field) => (
               <label className="field" htmlFor={field.name} key={field.name}>
-                <span className="field-label">{field.label}<span aria-hidden="true"> *</span></span>
+                <span className="field-label">
+                  {field.label}
+                  {field.required && <span aria-hidden="true"> *</span>}
+                </span>
                 {field.type === 'select' ? (
-                  <select id={field.name} name={field.name} value={values[field.name]} onChange={onChange} required>
+                  <select
+                    id={field.name}
+                    name={field.name}
+                    value={values[field.name]}
+                    onChange={onChange}
+                    required={field.required}
+                  >
                     <option value="" disabled>Select {field.label.toLowerCase()}</option>
                     {field.options.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
                   </select>
@@ -33,7 +42,7 @@ function PredictionForm({ values, onChange, onSubmit, onClear, loading }) {
                     min={field.min}
                     max={field.max}
                     step={field.step}
-                    required
+                    required={field.required}
                   />
                 )}
               </label>

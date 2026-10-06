@@ -1,0 +1,690 @@
+.eda-page {
+  width: calc(100% - var(--page-gutter) - var(--page-gutter));
+  max-width: var(--page-max-width);
+  height: auto;
+  max-height: none;
+  overflow: visible;
+  margin: 0 auto;
+  padding: 32px 0;
+  color: var(--ink);
+}
+
+.dashboard-layout.dashboard-layout--eda {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.dashboard-layout--eda .dashboard-sidebar {
+  position: relative;
+  flex-shrink: 0;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.dashboard-layout--eda .dashboard-content {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.eda-page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: var(--section-gap);
+}
+
+.eda-eyebrow {
+  margin: 0 0 7px;
+  color: var(--blue-deep);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eda-page-header h1 {
+  margin: 0;
+  color: var(--navy);
+  font: 700 clamp(25px, 3vw, 34px)/1.2 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.eda-page-header > div > p:last-child {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.eda-source {
+  flex: 0 0 auto;
+  padding: 7px 10px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.eda-overview {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: var(--section-gap);
+}
+
+.eda-overview-card,
+.eda-panel {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+  box-shadow: 0 5px 16px rgba(26, 44, 91, 0.06);
+}
+
+.eda-overview-card {
+  display: flex;
+  min-height: 112px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 17px 18px;
+}
+
+.eda-overview-card > span {
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.eda-overview-card strong {
+  margin-top: 6px;
+  color: var(--navy);
+  font: 700 25px/1.15 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.eda-overview-card small {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.eda-primary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: var(--section-gap);
+  margin-bottom: var(--section-gap);
+}
+
+.eda-panel {
+  min-width: 0;
+  padding: 20px;
+}
+
+.eda-panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.eda-panel-heading h2 {
+  margin: 0;
+  color: var(--navy);
+  font: 700 16px/1.35 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.eda-panel-heading p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.eda-target-list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 2px 0;
+}
+
+.eda-target-copy {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.eda-target-copy > span {
+  min-width: 0;
+}
+
+.eda-target-copy strong {
+  color: var(--navy);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.eda-target-copy small {
+  color: var(--muted);
+  font-size: 9px;
+  font-weight: 500;
+}
+
+.eda-target-track {
+  display: block;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #eaf5fd;
+  cursor: pointer;
+}
+
+.eda-target-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--blue);
+  transition: width 220ms ease, filter 160ms ease;
+}
+
+.eda-target-track:hover > span {
+  filter: brightness(1.16);
+}
+
+.eda-target-track:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.eda-panel-note {
+  margin: 16px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.eda-feature-heading {
+  align-items: flex-end;
+}
+
+.eda-feature-select {
+  display: flex;
+  min-width: 150px;
+  flex-direction: column;
+  gap: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.eda-feature-select select {
+  max-width: 190px;
+  min-height: 35px;
+  padding: 0 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--navy);
+  font-size: 12px;
+}
+
+.eda-pie-title {
+  margin: 0 0 10px;
+  color: var(--navy);
+  font: 700 13px/1.4 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.eda-feature-visual {
+  display: grid;
+  grid-template-columns: minmax(150px, 190px) minmax(0, 1fr);
+  align-items: center;
+  gap: 20px;
+  min-height: 220px;
+}
+
+.eda-pie-wrap,
+.eda-interactive-chart {
+  position: relative;
+  min-width: 0;
+}
+
+.eda-pie-chart {
+  display: block;
+  width: min(100%, 190px);
+  aspect-ratio: 1;
+  overflow: visible;
+  filter: drop-shadow(0 4px 7px rgba(26, 44, 91, 0.12));
+}
+
+.eda-pie-slice {
+  cursor: pointer;
+  stroke: #ffffff;
+  stroke-width: 2;
+  transition: filter 140ms ease, stroke-width 140ms ease;
+}
+
+.eda-pie-slice:hover,
+.eda-pie-slice:focus-visible {
+  filter: brightness(1.12);
+  stroke-width: 4;
+  outline: none;
+}
+
+.eda-chart-tooltip {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  width: 212px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: #1a2c5b;
+  box-shadow: 0 8px 22px rgba(26, 44, 91, 0.24);
+  color: #ffffff;
+  pointer-events: none;
+  animation: eda-tooltip-in 100ms ease-out;
+}
+
+.eda-chart-tooltip strong {
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eda-chart-tooltip span {
+  color: #ffffff;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.eda-chart-tooltip small {
+  color: #afdbf5;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+@keyframes eda-tooltip-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.eda-feature-legend {
+  display: flex;
+  max-height: 230px;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  margin: 0;
+  margin-left: 50px;
+  margin-right: 100px;
+  padding: 2px 4px 2px 0;
+  list-style: none;
+}
+
+.eda-feature-legend li {
+  display: grid;
+  grid-template-columns: 9px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 7px;
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.eda-legend-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+}
+
+.eda-legend-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eda-feature-legend strong {
+  color: var(--navy);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.eda-feature-legend small {
+  grid-column: 2 / 4;
+  margin-top: -5px;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.eda-numeric-panel,
+.eda-insights-panel {
+  margin-bottom: var(--section-gap);
+}
+
+.eda-numeric-chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.eda-chart-card {
+  min-width: 0;
+  padding: 15px 13px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.eda-chart-heading {
+  margin: 0 5px 8px;
+}
+
+.eda-chart-heading h3 {
+  margin: 0;
+  color: var(--navy);
+  font: 700 13px/1.4 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.eda-chart-heading p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.eda-chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.eda-chart-gridline {
+  stroke: var(--line);
+  stroke-dasharray: 3 4;
+  stroke-width: 1;
+}
+
+.eda-chart-axis {
+  stroke: #80b8e0;
+  stroke-width: 1;
+}
+
+.eda-chart-tick,
+.eda-chart-axis-label {
+  fill: var(--muted);
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 10px;
+}
+
+.eda-chart-axis-label {
+  fill: var(--navy);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.eda-histogram-bar {
+  fill: #0047ab;
+  opacity: 0.88;
+  transition: opacity 160ms ease;
+}
+
+.eda-histogram-bar:hover {
+  fill: #1a2c5b;
+  opacity: 1;
+  stroke: #1a2c5b;
+  stroke-width: 1.5;
+}
+
+.eda-histogram-bar:focus-visible {
+  fill: #1a2c5b;
+  opacity: 1;
+  stroke: #1a2c5b;
+  stroke-width: 2;
+  outline: none;
+}
+
+.eda-boxplot-whisker,
+.eda-boxplot-cap {
+  stroke: #0047ab;
+  stroke-width: 2;
+}
+
+.eda-boxplot-box {
+  fill: rgba(175, 219, 245, 0.75);
+  stroke: #0047ab;
+  stroke-width: 2;
+}
+
+.eda-boxplot-median {
+  stroke: #1a2c5b;
+  stroke-width: 3;
+}
+
+.eda-boxplot-outlier {
+  fill: #1a2c5b;
+  fill-opacity: 0.5;
+  stroke: #ffffff;
+  stroke-width: 0.65;
+}
+
+.eda-boxplot-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin: 0 4px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+}
+
+.eda-boxplot-stats dt {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.eda-boxplot-stats dd {
+  margin: 3px 0 0;
+  color: var(--navy);
+  font-size: 10px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.eda-boxplot-note {
+  margin: 8px 4px 0;
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.eda-insights {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 22px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.eda-insights li {
+  position: relative;
+  padding-left: 17px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.eda-insights li::before {
+  position: absolute;
+  top: 7px;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  content: '';
+}
+
+.eda-state-message,
+.eda-error {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--paper);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.eda-error {
+  border-color: var(--line);
+  color: var(--danger);
+}
+
+.eda-error h2 {
+  margin: 0 0 5px;
+  color: var(--navy);
+  font: 700 16px/1.4 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.eda-error p {
+  margin: 0;
+}
+
+@media (max-width: 1000px) {
+  .eda-page {
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+}
+
+@media (max-width: 900px) {
+  .eda-primary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .eda-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+}
+
+@media (max-width: 700px) {
+  .dashboard-layout--eda .dashboard-sidebar {
+    position: relative;
+    flex-shrink: 0;
+    height: auto;
+  }
+
+  .dashboard-layout.dashboard-layout--eda {
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .dashboard-layout--eda .dashboard-content {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .eda-page {
+    width: calc(100% - var(--page-gutter) - var(--page-gutter));
+    height: auto;
+    max-height: none;
+    overflow: visible;
+    padding: 24px 0;
+  }
+
+  .eda-page-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .eda-overview {
+    gap: 9px;
+  }
+
+  .eda-overview-card {
+    min-height: 96px;
+    padding: 13px;
+  }
+
+  .eda-overview-card strong {
+    font-size: 21px;
+  }
+
+  .eda-panel {
+    padding: 16px;
+  }
+
+  .eda-feature-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .eda-feature-select,
+  .eda-feature-select select {
+    width: 100%;
+    max-width: none;
+  }
+
+  .eda-insights {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .eda-numeric-chart-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 420px) {
+  .eda-feature-visual {
+    grid-template-columns: minmax(110px, 132px) minmax(0, 1fr);
+    gap: 12px;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eda-pie-slice,
+  .eda-chart-tooltip,
+  .eda-histogram-bar {
+    animation: none;
+    transition: none;
+  }
+
+  .eda-target-track > span {
+    transition: none;
+  }
+}
