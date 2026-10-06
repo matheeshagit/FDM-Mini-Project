@@ -8,7 +8,7 @@ function App() {
   const [activePage, setActivePage] = useState('home');
 
   return (
-    <div className="dashboard-layout">
+    <div className={`dashboard-layout${activePage === 'eda' ? ' dashboard-layout--eda' : ''}`}>
       <Sidebar activePage={activePage} onNavigate={setActivePage} />
       <div className="dashboard-content">
         {activePage === 'prediction' && <PredictionPage />}

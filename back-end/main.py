@@ -133,6 +133,7 @@ def build_eda_summary():
         )
 
     row_count = len(data)
+    rows_with_missing_values = int(data.isna().any(axis=1).sum())
     target_counts = data["readmitted"].value_counts()
     target = [
         {
@@ -260,7 +261,9 @@ def build_eda_summary():
             "columns": int(data.shape[1]),
             "features": int(data.shape[1] - 1),
             "targetClasses": len(target),
-            "missingCells": int(data.isna().to_numpy().sum()),
+            "duplicateRows": int(data.duplicated().sum()),
+            "rowsWithMissingValues": rows_with_missing_values,
+            "missingRowPercent": round(float(rows_with_missing_values / row_count * 100), 2),
         },
         "target": target,
         "features": features,

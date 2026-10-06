@@ -66,7 +66,7 @@ function FeaturePieChart({ bins, label }) {
   return (
     <div className="eda-feature-visual">
       <div className="eda-pie-wrap" ref={chartRef} onMouseLeave={() => setTooltip(null)}>
-        <svg className="eda-pie-chart" viewBox="0 0 220 220" role="img" aria-label={`${label} distribution pie chart`}>
+        <svg className="eda-pie-chart" viewBox="0 0 200 200" role="img" aria-label={`${label} distribution pie chart`}>
           {slices.filter(({ count }) => count > 0).map(({ label: binLabel, count, color, percent, start, end }) => {
             const showTooltip = (event) => setTooltip({
               position: getTooltipPosition(event, chartRef.current, true),
@@ -115,7 +115,7 @@ function DatasetOverview({ overview }) {
     { label: 'Encounters', value: formatCount(overview.records), detail: 'patient visits' },
     { label: 'Dataset columns', value: formatCount(overview.columns), detail: `${formatCount(overview.features)} non-target fields` },
     { label: 'Readmission classes', value: formatCount(overview.targetClasses), detail: 'outcome groups' },
-    { label: 'Missing cells', value: formatCount(overview.missingCells), detail: 'in the source dataset' }
+    { label: 'Duplicate rows', value: formatCount(overview.duplicateRows), detail: 'fully duplicated records' },
   ];
 
   return (
@@ -132,18 +132,20 @@ function DatasetOverview({ overview }) {
 }
 
 function TargetDistribution({ target }) {
-  const maximum = Math.max(...target.map(({ count }) => count), 1);
-
   return (
-    <div className="eda-target-list">
+    <div className="eda-target-list" aria-label="Readmission outcome distribution">
       {target.map(({ value, label, count, percent }) => (
-        <div className="eda-target-row" key={value} title={`${label}: ${formatCount(count)} (${percent}%)`}>
+        <div className="eda-target-row" key={value} title={`${label}: ${formatCount(count)} encounters (${percent}%)`}>
           <div className="eda-target-copy">
             <span>{label}</span>
             <strong>{formatCount(count)} <small>({percent}%)</small></strong>
           </div>
-          <div className="eda-target-track">
-            <span style={{ width: `${(count / maximum) * 100}%` }} />
+          <div
+            className="eda-target-track"
+            role="img"
+            aria-label={`${label}: ${formatCount(count)} encounters, ${percent}%`}
+          >
+            <span style={{ width: `${percent}%` }} />
           </div>
         </div>
       ))}
