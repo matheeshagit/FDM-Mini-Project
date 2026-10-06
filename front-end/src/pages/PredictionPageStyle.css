@@ -1,14 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap');
 
 :root {
-    --blue: #2f80ed;
-    --blue-deep: #1b5fae;
-    --navy: #123b5d;
-    --ink: #183247;
+    --blue: #1e3a8a;
+    --blue-deep: #1e3a8a;
+    --navy: #1e3a8a;
+    --ink: #1e3a8a;
     --muted: #687e8e;
     --line: #dce6ec;
     --paper: #ffffff;
-    --wash: #f4f8fb;
+    --wash: #f8fafc;
     --orange: #ff8a3d;
     --danger: #b54737;
     --danger-wash: #fff5f0;
@@ -39,7 +39,7 @@ button:focus-visible,
 input:focus-visible,
 select:focus-visible,
 a:focus-visible {
-    outline: 3px solid rgba(47, 128, 237, .28);
+    outline: 3px solid rgba(30, 58, 138, .28);
     outline-offset: 2px;
 }
 
@@ -74,7 +74,7 @@ a:focus-visible {
     position: relative;
     border-radius: 11px;
     background: var(--blue);
-    box-shadow: 0 5px 12px rgba(47, 128, 237, .2);
+    box-shadow: 0 5px 12px rgba(30, 58, 138, .2);
 }
 
 .brand-mark::before,
@@ -194,7 +194,7 @@ a:focus-visible {
     align-items: center;
     gap: 8px;
     margin-bottom: 14px;
-    color: #3976a7;
+    color: #1e3a8a;
     font-size: 12px;
     font-weight: 600;
 }
@@ -205,7 +205,7 @@ a:focus-visible {
     height: 23px;
     place-items: center;
     border-radius: 50%;
-    background: #e9f3ff;
+    background: #f1f5f9;
     color: var(--blue-deep);
     font-size: 10px;
 }
@@ -326,13 +326,13 @@ a:focus-visible {
 
 .field input:hover,
 .field select:hover {
-    border-color: #a8c6de;
+    border-color: #94a3b8;
 }
 
 .field input:focus,
 .field select:focus {
     border-color: var(--blue);
-    box-shadow: 0 0 0 3px rgba(47, 128, 237, .1);
+    box-shadow: 0 0 0 3px rgba(30, 58, 138, .1);
     outline: none;
 }
 
@@ -379,13 +379,13 @@ a:focus-visible {
     border: 0;
     background: var(--blue);
     color: white;
-    box-shadow: 0 7px 15px rgba(47, 128, 237, .19);
+    box-shadow: 0 7px 15px rgba(30, 58, 138, .19);
 }
 
 .submit-button:hover:not(:disabled) {
     transform: translateY(-1px);
-    background: #236fda;
-    box-shadow: 0 10px 19px rgba(47, 128, 237, .25);
+    background: #1e3a8a;
+    box-shadow: 0 10px 19px rgba(30, 58, 138, .25);
 }
 
 .submit-button>span:last-child {
@@ -517,7 +517,7 @@ a:focus-visible {
     align-items: baseline;
     gap: 7px 13px;
     padding: 11px 0;
-    border-top: 1px solid rgba(18, 59, 93, .1);
+    border-top: 1px solid rgba(30, 58, 138, .1);
     color: #647987;
     font-size: 12px;
 }
@@ -549,7 +549,7 @@ a:focus-visible {
     height: 7px;
     overflow: hidden;
     border-radius: 99px;
-    background: rgba(18, 59, 93, .12);
+    background: rgba(30, 58, 138, .12);
 }
 
 .probability-track span {
