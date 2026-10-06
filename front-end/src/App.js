@@ -1,22 +1,17 @@
 import PredictionPage from './pages/PredictionPage';
+import HomePage from './pages/HomePage';
 import Sidebar from './components/Sidebar';
 import { useState } from 'react';
 
 function App() {
-  const [activePage, setActivePage] = useState('prediction');
+  const [activePage, setActivePage] = useState('home');
 
   return (
     <div className="dashboard-layout">
       <Sidebar activePage={activePage} onNavigate={setActivePage} />
       <div className="dashboard-content">
         {activePage === 'prediction' && <PredictionPage />}
-        {activePage === 'home' && (
-          <main className="placeholder-page">
-            <p>Healthcare analytics</p>
-            <h1>Home</h1>
-            <span>Your workspace for patient readmission insights.</span>
-          </main>
-        )}
+        {activePage === 'home' && <HomePage onNavigate={setActivePage} />}
         {activePage === 'eda' && (
           <main className="placeholder-page">
             <p>Explore the data</p>
