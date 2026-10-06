@@ -18,6 +18,11 @@ py -3.13 -m venv .venv
 ```
 
 If `.venv` is already set up, only run the final command. For a different backend origin, set `REACT_APP_API_URL` before starting the frontend; direct cross-origin use requires the backend to allow that origin.
+$env:REACT_APP_API_URL = "http://localhost:5000"
+npm start
+```
+
+The API URL defaults to `http://localhost:5000`. Set `REACT_APP_API_URL` to the backend origin before starting the development server to use a different address.
 
 ## Backend contract
 
@@ -26,3 +31,4 @@ Send a JSON object with these exact feature names: `race`, `gender`, `age`, `adm
 The frontend sends numeric fields as JSON numbers and category fields as the original dataset strings. The notebook's target is `readmitted_binary`, where `1` means the original `readmitted` value was `<30`; all other target values are `0`.
 
 The existing endpoint returns `readmission_flag` as `0` or `1` and `readmission_probability` between `0` and `1`; the frontend maps those fields to the displayed result and only shows probability when the response includes a valid value. Fields the backend declares optional are omitted when left blank so its declared defaults are applied.
+The endpoint should return a JSON object with `prediction` as `0` or `1`. It may also return `label` using the displayed result labels and `probability` as a number between `0` and `1`. The probability is shown only when the backend includes a valid value.

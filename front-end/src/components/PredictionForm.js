@@ -1,4 +1,4 @@
-import { fieldGroups, optionalFeatures } from '../services/features';
+import { fieldGroups } from '../services/features';
 
 function PredictionForm({ values, onChange, onSubmit, onClear, loading }) {
   return (
@@ -16,11 +16,9 @@ function PredictionForm({ values, onChange, onSubmit, onClear, loading }) {
           <div className="field-grid">
             {group.fields.map((field) => (
               <label className="field" htmlFor={field.name} key={field.name}>
-                <span className="field-label">
-                  {field.label}{!optionalFeatures.has(field.name) && <span aria-hidden="true"> *</span>}
-                </span>
+                <span className="field-label">{field.label}<span aria-hidden="true"> *</span></span>
                 {field.type === 'select' ? (
-                  <select id={field.name} name={field.name} value={values[field.name]} onChange={onChange} required={!optionalFeatures.has(field.name)}>
+                  <select id={field.name} name={field.name} value={values[field.name]} onChange={onChange} required>
                     <option value="" disabled>Select {field.label.toLowerCase()}</option>
                     {field.options.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
                   </select>
@@ -35,7 +33,7 @@ function PredictionForm({ values, onChange, onSubmit, onClear, loading }) {
                     min={field.min}
                     max={field.max}
                     step={field.step}
-                    required={!optionalFeatures.has(field.name)}
+                    required
                   />
                 )}
               </label>

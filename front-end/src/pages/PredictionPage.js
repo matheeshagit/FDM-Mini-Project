@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import PredictionForm from '../components/PredictionForm';
 import PredictionResult from '../components/PredictionResult';
 import { predictReadmission } from '../services/api';
-import { emptyForm, featureNames, numericFeatures, optionalFeatures } from '../services/features';
+import { emptyForm, featureNames, numericFeatures } from '../services/features';
 
 function PredictionPage() {
   const [values, setValues] = useState(emptyForm);
@@ -36,12 +36,10 @@ function PredictionPage() {
       return;
     }
 
-    const patientData = Object.fromEntries(featureNames
-      .filter((name) => !optionalFeatures.has(name) || values[name] !== '')
-      .map((name) => [
+    const patientData = Object.fromEntries(featureNames.map((name) => [
       name,
       numericFeatures.has(name) ? Number(values[name]) : values[name]
-      ]));
+    ]));
 
     setLoading(true);
     try {
