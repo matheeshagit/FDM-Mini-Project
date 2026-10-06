@@ -1,4 +1,4 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 function normalizePrediction(data) {
   const value = data.prediction ?? data.label;
@@ -35,7 +35,7 @@ export async function predictReadmission(patientData) {
   if (!data || typeof data !== 'object') {
     throw new Error('The prediction service returned an invalid response.');
   }
-
+  console.log(data)
   const probability = typeof data.probability === 'number'
     && Number.isFinite(data.probability)
     && data.probability >= 0
