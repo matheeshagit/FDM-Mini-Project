@@ -4,6 +4,9 @@ import pandas as pd
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from typing import Optional
+from fastapi.middleware.cors import CORSMiddleware
+
+
 
 # Get the directory where main.py is located
 BASE_DIR = Path(__file__).resolve().parent
@@ -16,6 +19,14 @@ app = FastAPI(
     title="Hospital Readmission Prediction API",
     description="Backend service for predicting 30-day readmission risk for diabetic patients.",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 try:
@@ -99,13 +110,11 @@ def predict_readmission(patient: PatientData):
         is_high_risk = prob_readmit >= OPTIMAL_THRESHOLD
 
         # Return clear and actionable JSON response
-        return {
-            "prediction": "High Risk (<30 Days Readmission)" if is_high_risk else "Low/Standard Risk",
-            "readmission_flag": int(is_high_risk),
-            "readmission_probability": round(prob_readmit, 4),
-            "operational_threshold_used": OPTIMAL_THRESHOLD,
-            "risk_category": "CRITICAL" if prob_readmit >= 0.70 else ("MODERATE" if is_high_risk else "LOW")
-        }
+        return { "prediction": int(is_high_risk), 
+                "readmission_flag": int(is_high_risk), 
+                "probability": round(prob_readmit, 4), 
+                "operational_threshold_used": OPTIMAL_THRESHOLD, 
+                "risk_category": "CRITICAL" if prob_readmit >= 0.70 else ("MODERATE" if is_high_risk else "LOW") }
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Inference error: {str(e)}")
