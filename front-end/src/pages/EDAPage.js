@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { fetchEdaSummary } from '../services/eda';
 import './EDAPage.css';
 
@@ -6,7 +6,54 @@ function formatCount(value) {
   return new Intl.NumberFormat().format(value);
 }
 
+function getTooltipPosition(event, container, anchorBottom = false) {
+  const bounds = container.getBoundingClientRect();
+  const targetBounds = event.currentTarget.getBoundingClientRect();
+  const hasPointerPosition = event.clientX !== 0 || event.clientY !== 0;
+  const pointerX = hasPointerPosition ? event.clientX : targetBounds.left + targetBounds.width / 2;
+  const pointerY = hasPointerPosition ? event.clientY : targetBounds.top + targetBounds.height / 2;
+  const tooltipWidth = Math.min(212, bounds.width - 16);
+  const localY = pointerY - bounds.top;
+
+  return {
+    left: Math.max(8, Math.min(pointerX - bounds.left + 14, bounds.width - tooltipWidth - 8)),
+    top: anchorBottom ? localY : Math.max(8, Math.min(localY + 14, bounds.height - 96)),
+    width: tooltipWidth,
+    transform: anchorBottom ? 'translateY(-100%)' : 'none'
+  };
+}
+
+function ChartTooltip({ details, position }) {
+  if (!details || !position) return null;
+
+  return (
+    <div className="eda-chart-tooltip" role="tooltip" style={position}>
+      <strong>{details.title}</strong>
+      <span>{details.value}</span>
+      <small>{details.note}</small>
+    </div>
+  );
+}
+
+function pieSlicePath(startAngle, endAngle, radius, center) {
+  if (endAngle - startAngle >= 359.999) {
+    return `M ${center} ${center - radius} A ${radius} ${radius} 0 1 1 ${center} ${center + radius} A ${radius} ${radius} 0 1 1 ${center} ${center - radius} Z`;
+  }
+
+  const startRadians = ((startAngle - 90) * Math.PI) / 180;
+  const endRadians = ((endAngle - 90) * Math.PI) / 180;
+  const startX = center + radius * Math.cos(startRadians);
+  const startY = center + radius * Math.sin(startRadians);
+  const endX = center + radius * Math.cos(endRadians);
+  const endY = center + radius * Math.sin(endRadians);
+  const largeArc = endAngle - startAngle > 180 ? 1 : 0;
+
+  return `M ${center} ${center} L ${startX} ${startY} A ${radius} ${radius} 0 ${largeArc} 1 ${endX} ${endY} Z`;
+}
+
 function FeaturePieChart({ bins, label }) {
+  const chartRef = useRef(null);
+  const [tooltip, setTooltip] = useState(null);
   const total = bins.reduce((sum, { count }) => sum + count, 0);
   const colors = ['#1e3a8a', '#334155', '#475569', '#64748b', '#94a3b8', '#cbd5e1'];
   let angle = 0;
@@ -16,22 +63,42 @@ function FeaturePieChart({ bins, label }) {
     angle += percent * 3.6;
     return { ...bin, color: colors[index % colors.length], percent, start, end: angle };
   });
-  const gradient = slices
-    .filter(({ count }) => count > 0)
-    .map(({ color, start, end }) => `${color} ${start}deg ${end}deg`)
-    .join(', ');
-
   return (
     <div className="eda-feature-visual">
-      <div
-        className="eda-pie-chart"
-        role="img"
-        aria-label={`${label} distribution pie chart`}
-        style={{ background: gradient ? `conic-gradient(${gradient})` : '#e2e8f0' }}
-      />
+      <div className="eda-pie-wrap" ref={chartRef} onMouseLeave={() => setTooltip(null)}>
+        <svg className="eda-pie-chart" viewBox="0 0 220 220" role="img" aria-label={`${label} distribution pie chart`}>
+          {slices.filter(({ count }) => count > 0).map(({ label: binLabel, count, color, percent, start, end }) => {
+            const showTooltip = (event) => setTooltip({
+              position: getTooltipPosition(event, chartRef.current, true),
+              details: {
+                title: binLabel,
+                value: `${formatCount(count)} encounters`,
+                note: `${percent.toFixed(1)}% of ${label.toLowerCase()} records`
+              }
+            });
+
+            return (
+              <path
+                className="eda-pie-slice"
+                d={pieSlicePath(start, end, 100, 110)}
+                fill={color}
+                key={binLabel}
+                tabIndex="0"
+                aria-label={`${binLabel}: ${formatCount(count)} encounters, ${percent.toFixed(1)} percent`}
+                onMouseEnter={showTooltip}
+                onMouseMove={showTooltip}
+                onMouseLeave={() => setTooltip(null)}
+                onFocus={showTooltip}
+                onBlur={() => setTooltip(null)}
+              />
+            );
+          })}
+        </svg>
+        {tooltip && <ChartTooltip details={tooltip.details} position={tooltip.position} />}
+      </div>
       <ul className="eda-feature-legend" aria-label={`${label} values`}>
         {slices.map(({ label: binLabel, count, color, percent }) => (
-          <li key={binLabel} title={`${binLabel}: ${formatCount(count)} (${percent.toFixed(1)}%)`}>
+          <li key={binLabel}>
             <span className="eda-legend-swatch" style={{ backgroundColor: color }} aria-hidden="true" />
             <span className="eda-legend-label">{binLabel}</span>
             <strong>{percent.toFixed(1)}%</strong>
@@ -89,6 +156,8 @@ function formatAxisValue(value) {
 }
 
 function NumericHistogram({ distribution }) {
+  const chartRef = useRef(null);
+  const [tooltip, setTooltip] = useState(null);
   const { histogram, label } = distribution;
   const width = 720;
   const height = 250;
@@ -105,7 +174,10 @@ function NumericHistogram({ distribution }) {
   const x = (value) => left + ((value - minimum) / range) * plotWidth;
   const y = (count) => top + plotHeight - (count / maxCount) * plotHeight;
 
+  const total = histogram.reduce((sum, { count }) => sum + count, 0);
+
   return (
+    <div className="eda-interactive-chart" ref={chartRef} onMouseLeave={() => setTooltip(null)}>
     <svg className="eda-chart-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Histogram of ${label}`}>
       {[0, 0.25, 0.5, 0.75, 1].map((fraction) => {
         const count = Math.round(maxCount * fraction);
@@ -120,6 +192,16 @@ function NumericHistogram({ distribution }) {
       {histogram.map(({ label: binLabel, count, lower, upper }) => {
         const barX = x(lower);
         const barWidth = Math.max(1, x(upper) - barX - 2);
+        const percent = total ? (count / total) * 100 : 0;
+        const showTooltip = (event) => setTooltip({
+          position: getTooltipPosition(event, chartRef.current, true),
+          details: {
+            title: binLabel,
+            value: `${formatCount(count)} encounters`,
+            note: `${percent.toFixed(1)}% of ${label.toLowerCase()} records`
+          }
+        });
+
         return (
           <rect
             className="eda-histogram-bar"
@@ -129,8 +211,13 @@ function NumericHistogram({ distribution }) {
             width={barWidth}
             height={Math.max(0, top + plotHeight - y(count))}
             rx="2"
+            tabIndex="0"
+            aria-label={`${label}, ${binLabel}: ${formatCount(count)} encounters, ${percent.toFixed(1)} percent`}
+            onMouseEnter={showTooltip}
+            onMouseMove={showTooltip}
+            onFocus={showTooltip}
+            onBlur={() => setTooltip(null)}
           >
-            <title>{`${binLabel}: ${formatCount(count)} encounters`}</title>
           </rect>
         );
       })}
@@ -150,6 +237,8 @@ function NumericHistogram({ distribution }) {
         {label}
       </text>
     </svg>
+    {tooltip && <ChartTooltip details={tooltip.details} position={tooltip.position} />}
+    </div>
   );
 }
 

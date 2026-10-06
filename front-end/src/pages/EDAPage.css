@@ -208,12 +208,80 @@
   min-height: 220px;
 }
 
+.eda-pie-wrap,
+.eda-interactive-chart {
+  position: relative;
+  min-width: 0;
+}
+
 .eda-pie-chart {
+  display: block;
   width: min(100%, 190px);
   aspect-ratio: 1;
-  border: 1px solid rgba(30, 58, 138, 0.12);
-  border-radius: 50%;
-  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1);
+  overflow: visible;
+  filter: drop-shadow(0 4px 7px rgba(15, 23, 42, 0.12));
+}
+
+.eda-pie-slice {
+  cursor: pointer;
+  stroke: #ffffff;
+  stroke-width: 2;
+  transition: filter 140ms ease, stroke-width 140ms ease;
+}
+
+.eda-pie-slice:hover,
+.eda-pie-slice:focus-visible {
+  filter: brightness(1.12);
+  stroke-width: 4;
+  outline: none;
+}
+
+.eda-chart-tooltip {
+  position: absolute;
+  z-index: 5;
+  display: flex;
+  width: 212px;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  background: #0f172a;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.22);
+  color: #ffffff;
+  pointer-events: none;
+  animation: eda-tooltip-in 100ms ease-out;
+}
+
+.eda-chart-tooltip strong {
+  overflow: hidden;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.eda-chart-tooltip span {
+  color: #ffffff;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.eda-chart-tooltip small {
+  color: #cbd5e1;
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+@keyframes eda-tooltip-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .eda-feature-legend {
@@ -335,7 +403,18 @@
 }
 
 .eda-histogram-bar:hover {
+  fill: #334155;
   opacity: 1;
+  stroke: #0f172a;
+  stroke-width: 1.5;
+}
+
+.eda-histogram-bar:focus-visible {
+  fill: #334155;
+  opacity: 1;
+  stroke: #0f172a;
+  stroke-width: 2;
+  outline: none;
 }
 
 .eda-boxplot-whisker,
@@ -517,6 +596,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .eda-pie-slice,
+  .eda-chart-tooltip,
+  .eda-histogram-bar {
+    animation: none;
+    transition: none;
+  }
+
   .eda-target-track > span {
     transition: none;
   }
