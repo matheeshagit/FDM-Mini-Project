@@ -84,40 +84,150 @@ function TargetDistribution({ target }) {
   );
 }
 
-function CorrelationMatrix({ correlations }) {
-  const { labels, matrix } = correlations;
+function formatAxisValue(value) {
+  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(value);
+}
+
+function NumericHistogram({ distribution }) {
+  const { histogram, label } = distribution;
+  const width = 720;
+  const height = 250;
+  const left = 52;
+  const right = 18;
+  const top = 18;
+  const bottom = 48;
+  const plotWidth = width - left - right;
+  const plotHeight = height - top - bottom;
+  const minimum = histogram[0].lower;
+  const maximum = histogram[histogram.length - 1].upper;
+  const range = maximum - minimum || 1;
+  const maxCount = Math.max(...histogram.map(({ count }) => count), 1);
+  const x = (value) => left + ((value - minimum) / range) * plotWidth;
+  const y = (count) => top + plotHeight - (count / maxCount) * plotHeight;
 
   return (
-    <div
-      className="eda-heatmap"
-      role="table"
-      aria-label="Pearson correlation matrix"
-      style={{ '--eda-matrix-size': labels.length }}
-    >
-      <span className="eda-heatmap-corner" role="columnheader" />
-      {labels.map((label) => (
-        <span className="eda-heatmap-heading" role="columnheader" key={`col-${label}`}>{label}</span>
+    <svg className="eda-chart-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Histogram of ${label}`}>
+      {[0, 0.25, 0.5, 0.75, 1].map((fraction) => {
+        const count = Math.round(maxCount * fraction);
+        const yPosition = y(count);
+        return (
+          <g key={fraction}>
+            <line className="eda-chart-gridline" x1={left} x2={width - right} y1={yPosition} y2={yPosition} />
+            <text className="eda-chart-tick" x={left - 8} y={yPosition + 4} textAnchor="end">{formatCount(count)}</text>
+          </g>
+        );
+      })}
+      {histogram.map(({ label: binLabel, count, lower, upper }) => {
+        const barX = x(lower);
+        const barWidth = Math.max(1, x(upper) - barX - 2);
+        return (
+          <rect
+            className="eda-histogram-bar"
+            key={binLabel}
+            x={barX + 1}
+            y={y(count)}
+            width={barWidth}
+            height={Math.max(0, top + plotHeight - y(count))}
+            rx="2"
+          >
+            <title>{`${binLabel}: ${formatCount(count)} encounters`}</title>
+          </rect>
+        );
+      })}
+      <line className="eda-chart-axis" x1={left} x2={width - right} y1={top + plotHeight} y2={top + plotHeight} />
+      {[0, 0.25, 0.5, 0.75, 1].map((fraction) => (
+        <text
+          className="eda-chart-tick"
+          key={fraction}
+          x={left + fraction * plotWidth}
+          y={height - 17}
+          textAnchor={fraction === 0 ? 'start' : fraction === 1 ? 'end' : 'middle'}
+        >
+          {formatAxisValue(minimum + fraction * range)}
+        </text>
       ))}
-      {matrix.map((row, rowIndex) => (
-        <div className="eda-heatmap-row" role="row" key={`row-${labels[rowIndex]}`}>
-          <span className="eda-heatmap-row-label" role="rowheader">{labels[rowIndex]}</span>
-          {row.map((value, columnIndex) => {
-            const opacity = 0.08 + Math.abs(value) * 0.82;
-            return (
-              <span
-                className="eda-heatmap-cell"
-                role="cell"
-                key={`${rowIndex}-${columnIndex}`}
-                title={`${labels[rowIndex]} and ${labels[columnIndex]}: r = ${value}`}
-                style={{ backgroundColor: `rgba(30, 58, 138, ${opacity})`, color: opacity > 0.52 ? '#ffffff' : '#1e3a8a' }}
-              >
-                {value.toFixed(2)}
-              </span>
-            );
-          })}
-        </div>
-      ))}
-    </div>
+      <text className="eda-chart-axis-label" x={left + plotWidth / 2} y={height - 2} textAnchor="middle">
+        {label}
+      </text>
+    </svg>
+  );
+}
+
+function NumericBoxPlot({ distribution }) {
+  const { label, stats } = distribution;
+  const width = 720;
+  const height = 190;
+  const left = 52;
+  const right = 18;
+  const plotWidth = width - left - right;
+  const minimum = stats.min;
+  const maximum = stats.max;
+  const range = maximum - minimum || 1;
+  const x = (value) => left + ((value - minimum) / range) * plotWidth;
+  const centerY = 70;
+  const boxTop = 48;
+  const boxHeight = 44;
+  const axisY = 122;
+
+  return (
+    <>
+      <svg className="eda-chart-svg eda-boxplot-svg" viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`Box plot of ${label}`}>
+        <line className="eda-boxplot-whisker" x1={x(stats.lowerWhisker)} x2={x(stats.upperWhisker)} y1={centerY} y2={centerY} />
+        <line className="eda-boxplot-cap" x1={x(stats.lowerWhisker)} x2={x(stats.lowerWhisker)} y1={centerY - 13} y2={centerY + 13} />
+        <line className="eda-boxplot-cap" x1={x(stats.upperWhisker)} x2={x(stats.upperWhisker)} y1={centerY - 13} y2={centerY + 13} />
+        <rect
+          className="eda-boxplot-box"
+          x={x(stats.q1)}
+          y={boxTop}
+          width={Math.max(2, x(stats.q3) - x(stats.q1))}
+          height={boxHeight}
+          rx="4"
+        />
+        <line className="eda-boxplot-median" x1={x(stats.median)} x2={x(stats.median)} y1={boxTop} y2={boxTop + boxHeight} />
+        {(stats.outlierSample || []).map((value, index) => {
+          const jitter = ((index * 37) % 27) - 13;
+          return (
+            <circle
+              className="eda-boxplot-outlier"
+              key={`${value}-${index}`}
+              cx={x(value)}
+              cy={centerY + jitter}
+              r="2.5"
+            >
+              <title>{`Outlier value: ${formatAxisValue(value)}`}</title>
+            </circle>
+          );
+        })}
+        <line className="eda-chart-axis" x1={left} x2={width - right} y1={axisY} y2={axisY} />
+        {[0, 0.25, 0.5, 0.75, 1].map((fraction) => (
+          <text
+            className="eda-chart-tick"
+            key={fraction}
+            x={left + fraction * plotWidth}
+            y={axisY + 19}
+            textAnchor={fraction === 0 ? 'start' : fraction === 1 ? 'end' : 'middle'}
+          >
+            {formatAxisValue(minimum + fraction * range)}
+          </text>
+        ))}
+        <text className="eda-chart-axis-label" x={left + plotWidth / 2} y={height - 5} textAnchor="middle">
+          {label}
+        </text>
+      </svg>
+      <dl className="eda-boxplot-stats">
+        <div><dt>Min</dt><dd>{formatAxisValue(stats.min)}</dd></div>
+        <div><dt>Q1</dt><dd>{formatAxisValue(stats.q1)}</dd></div>
+        <div><dt>Median</dt><dd>{formatAxisValue(stats.median)}</dd></div>
+        <div><dt>Q3</dt><dd>{formatAxisValue(stats.q3)}</dd></div>
+        <div><dt>Max</dt><dd>{formatAxisValue(stats.max)}</dd></div>
+      </dl>
+      <p className="eda-boxplot-note">
+        {formatCount(stats.outlierCount)} values outside the 1.5×IQR whiskers
+        {stats.outlierCount > (stats.outlierSample || []).length
+          ? ` · displaying ${formatCount((stats.outlierSample || []).length)} sampled points`
+          : ''}
+      </p>
+    </>
   );
 }
 
@@ -126,6 +236,7 @@ function EDAPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedFeature, setSelectedFeature] = useState('readmitted');
+  const [selectedNumericFeature, setSelectedNumericFeature] = useState('time_in_hospital');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -149,6 +260,10 @@ function EDAPage() {
   const feature = useMemo(
     () => summary?.features.find(({ key }) => key === selectedFeature),
     [summary, selectedFeature]
+  );
+  const numericFeature = useMemo(
+    () => summary?.numericDistributions?.find(({ key }) => key === selectedNumericFeature),
+    [summary, selectedNumericFeature]
   );
 
   return (
@@ -211,15 +326,37 @@ function EDAPage() {
             </article>
           </section>
 
-          <section className="eda-panel eda-correlation-panel">
-            <div className="eda-panel-heading">
+          <section className="eda-panel eda-numeric-panel">
+            <div className="eda-panel-heading eda-feature-heading">
               <div>
-                <h2>Correlation analysis</h2>
-                <p>Correlation shows the strength and direction of relationships between numerical variables.</p>
+                <h2>Numerical feature analysis</h2>
+                <p>Explore the numeric feature distributions and spot potential outliers.</p>
               </div>
-              <span className="eda-correlation-key">Pearson r: −1 to +1</span>
+              <label className="eda-feature-select">
+                <span>Select numerical feature</span>
+                <select value={selectedNumericFeature} onChange={(event) => setSelectedNumericFeature(event.target.value)}>
+                  {(summary.numericDistributions || []).map(({ key, label }) => <option value={key} key={key}>{label}</option>)}
+                </select>
+              </label>
             </div>
-            <CorrelationMatrix correlations={summary.correlations} />
+            {numericFeature && (
+              <div className="eda-numeric-chart-grid">
+                <article className="eda-chart-card">
+                  <div className="eda-chart-heading">
+                    <h3>Histogram</h3>
+                    <p>Value frequency across encounters</p>
+                  </div>
+                  <NumericHistogram distribution={numericFeature} />
+                </article>
+                <article className="eda-chart-card">
+                  <div className="eda-chart-heading">
+                    <h3>Box plot</h3>
+                    <p>Spread, median, quartiles, and outliers</p>
+                  </div>
+                  <NumericBoxPlot distribution={numericFeature} />
+                </article>
+              </div>
+            )}
           </section>
 
           <section className="eda-panel eda-insights-panel">

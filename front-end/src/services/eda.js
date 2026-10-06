@@ -14,7 +14,13 @@ export async function fetchEdaSummary(signal) {
   if (!response.ok) {
     throw new Error(data?.detail || 'The EDA data service could not load the dataset summary.');
   }
-  if (!data || typeof data !== 'object' || !Array.isArray(data.features) || !Array.isArray(data.target)) {
+  if (
+    !data
+    || typeof data !== 'object'
+    || !Array.isArray(data.features)
+    || !Array.isArray(data.target)
+    || !Array.isArray(data.numericDistributions)
+  ) {
     throw new Error('The EDA data service returned an invalid dataset summary.');
   }
 

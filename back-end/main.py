@@ -98,19 +98,18 @@ EDA_TARGET_LABELS = {
     ">30": "Readmitted after 30 days",
     "<30": "Readmitted within 30 days",
 }
-EDA_CORRELATION_FEATURES = [
-    "time_in_hospital",
-    "num_lab_procedures",
-    "num_medications",
-    "number_inpatient",
-    "number_diagnoses",
-]
-EDA_CORRELATION_LABELS = {
-    "time_in_hospital": "Hospital days",
+EDA_NUMERIC_LABELS = {
+    "admission_type_id": "Admission type",
+    "discharge_disposition_id": "Discharge disposition",
+    "admission_source_id": "Admission source",
+    "time_in_hospital": "Time in hospital",
     "num_lab_procedures": "Lab procedures",
+    "num_procedures": "Procedures",
     "num_medications": "Medications",
-    "number_inpatient": "Prior inpatient",
-    "number_diagnoses": "Diagnoses",
+    "number_outpatient": "Outpatient visits",
+    "number_emergency": "Emergency visits",
+    "number_inpatient": "Inpatient visits",
+    "number_diagnoses": "Number of diagnoses",
 }
 
 
@@ -125,7 +124,6 @@ def build_eda_summary():
     data = pd.read_csv(EDA_DATA_PATH, na_values="?", low_memory=False)
     required_columns = {
         *EDA_PIE_FEATURES,
-        *EDA_CORRELATION_FEATURES,
     }
     missing_columns = required_columns.difference(data.columns)
     if missing_columns:
@@ -165,11 +163,6 @@ def build_eda_summary():
             "stats": None,
         })
 
-    correlations = data[EDA_CORRELATION_FEATURES].corr()
-    correlation_values = [
-        [round(float(correlations.loc[row, column]), 3) for column in EDA_CORRELATION_FEATURES]
-        for row in EDA_CORRELATION_FEATURES
-    ]
     age_counts = data["age"].value_counts()
     age_group, age_count = age_counts.idxmax(), int(age_counts.max())
     inpatient_zero = int((data["number_inpatient"] == 0).sum())
@@ -187,11 +180,78 @@ def build_eda_summary():
             f"{inpatient_zero / row_count:.1%} of encounters had no prior-year inpatient visits "
             "(number_inpatient = 0)."
         ),
-        (
-            "Hospital days and medication count had a positive Pearson correlation "
-            f"(r = {correlations.loc['time_in_hospital', 'num_medications']:.3f})."
-        ),
     ]
+
+    id_columns = {"encounter_id", "patient_nbr"}
+    numeric_columns = [
+        column for column in data.select_dtypes(include="number").columns
+        if column not in id_columns
+    ]
+    numeric_distributions = []
+    for column in numeric_columns:
+        series = data[column].dropna()
+        if series.empty:
+            continue
+
+        if series.nunique() < 20:
+            value_counts = series.value_counts().sort_index()
+            histogram = [
+                {
+                    "label": str(value),
+                    "count": int(count),
+                    "lower": float(value) - 0.5,
+                    "upper": float(value) + 0.5,
+                }
+                for value, count in value_counts.items()
+            ]
+        else:
+            binned = pd.cut(series, bins=30).value_counts(sort=False)
+            histogram = [
+                {
+                    "label": str(interval),
+                    "count": int(count),
+                    "lower": float(interval.left),
+                    "upper": float(interval.right),
+                }
+                for interval, count in binned.items()
+            ]
+
+        quartiles = series.quantile([0.25, 0.5, 0.75])
+        first_quartile = float(quartiles.loc[0.25])
+        median = float(quartiles.loc[0.5])
+        third_quartile = float(quartiles.loc[0.75])
+        interquartile_range = third_quartile - first_quartile
+        lower_fence = first_quartile - 1.5 * interquartile_range
+        upper_fence = third_quartile + 1.5 * interquartile_range
+        inliers = series[(series >= lower_fence) & (series <= upper_fence)]
+        outliers = series[(series < lower_fence) | (series > upper_fence)].sort_values().reset_index(drop=True)
+        sample_size = min(len(outliers), 250)
+        if sample_size == 1:
+            outlier_sample = [float(outliers.iloc[0])]
+        elif sample_size > 1:
+            sample_indexes = [
+                round(index * (len(outliers) - 1) / (sample_size - 1))
+                for index in range(sample_size)
+            ]
+            outlier_sample = [float(outliers.iloc[index]) for index in sample_indexes]
+        else:
+            outlier_sample = []
+        numeric_distributions.append({
+            "key": column,
+            "label": EDA_NUMERIC_LABELS.get(column, column.replace("_", " ").title()),
+            "histogram": histogram,
+            "stats": {
+                "min": float(series.min()),
+                "q1": first_quartile,
+                "median": median,
+                "q3": third_quartile,
+                "max": float(series.max()),
+                "lowerWhisker": float(inliers.min()),
+                "upperWhisker": float(inliers.max()),
+                "outlierCount": int(len(outliers)),
+                "outlierSample": outlier_sample,
+            },
+        })
 
     return {
         "source": EDA_DATA_PATH.name,
@@ -204,10 +264,7 @@ def build_eda_summary():
         },
         "target": target,
         "features": features,
-        "correlations": {
-            "labels": [EDA_CORRELATION_LABELS[key] for key in EDA_CORRELATION_FEATURES],
-            "matrix": correlation_values,
-        },
+        "numericDistributions": numeric_distributions,
         "insights": observations,
     }
 

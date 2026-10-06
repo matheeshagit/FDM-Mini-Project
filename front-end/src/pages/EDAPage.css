@@ -38,8 +38,7 @@
   line-height: 1.55;
 }
 
-.eda-source,
-.eda-correlation-key {
+.eda-source {
   flex: 0 0 auto;
   padding: 7px 10px;
   border: 1px solid var(--line);
@@ -263,56 +262,132 @@
   font-size: 10px;
 }
 
-.eda-correlation-panel,
+.eda-numeric-panel,
 .eda-insights-panel {
   margin-bottom: 16px;
 }
 
-.eda-heatmap {
+.eda-numeric-chart-grid {
   display: grid;
-  grid-template-columns: 110px repeat(var(--eda-matrix-size), minmax(44px, 1fr));
-  gap: 5px;
-  overflow-x: auto;
-  padding-bottom: 2px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
 }
 
-.eda-heatmap-corner {
-  grid-column: 1;
-  grid-row: 1;
+.eda-chart-card {
+  min-width: 0;
+  padding: 15px 13px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
 }
 
-.eda-heatmap-heading {
-  display: flex;
-  min-height: 40px;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 0 3px 6px;
+.eda-chart-heading {
+  margin: 0 5px 8px;
+}
+
+.eda-chart-heading h3 {
+  margin: 0;
+  color: var(--navy);
+  font: 700 13px/1.4 'Manrope', 'Segoe UI', sans-serif;
+}
+
+.eda-chart-heading p {
+  margin: 3px 0 0;
   color: var(--muted);
   font-size: 10px;
-  line-height: 1.2;
-  text-align: center;
 }
 
-.eda-heatmap-row {
-  display: contents;
+.eda-chart-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
 }
 
-.eda-heatmap-row-label {
-  display: flex;
-  align-items: center;
-  padding-right: 5px;
-  color: #475569;
+.eda-chart-gridline {
+  stroke: #e2e8f0;
+  stroke-dasharray: 3 4;
+  stroke-width: 1;
+}
+
+.eda-chart-axis {
+  stroke: #94a3b8;
+  stroke-width: 1;
+}
+
+.eda-chart-tick,
+.eda-chart-axis-label {
+  fill: #64748b;
+  font-family: 'Segoe UI', sans-serif;
   font-size: 10px;
 }
 
-.eda-heatmap-cell {
-  display: grid;
-  min-height: 38px;
-  place-items: center;
-  border: 1px solid rgba(30, 58, 138, 0.08);
-  border-radius: 5px;
+.eda-chart-axis-label {
+  fill: #475569;
   font-size: 11px;
+  font-weight: 600;
+}
+
+.eda-histogram-bar {
+  fill: #1e3a8a;
+  opacity: 0.88;
+  transition: opacity 160ms ease;
+}
+
+.eda-histogram-bar:hover {
+  opacity: 1;
+}
+
+.eda-boxplot-whisker,
+.eda-boxplot-cap {
+  stroke: #1e3a8a;
+  stroke-width: 2;
+}
+
+.eda-boxplot-box {
+  fill: rgba(30, 58, 138, 0.16);
+  stroke: #1e3a8a;
+  stroke-width: 2;
+}
+
+.eda-boxplot-median {
+  stroke: #0f172a;
+  stroke-width: 3;
+}
+
+.eda-boxplot-outlier {
+  fill: #0f172a;
+  fill-opacity: 0.5;
+  stroke: #ffffff;
+  stroke-width: 0.65;
+}
+
+.eda-boxplot-stats {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
+  margin: 0 4px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+}
+
+.eda-boxplot-stats dt {
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.eda-boxplot-stats dd {
+  margin: 3px 0 0;
+  color: var(--navy);
+  font-size: 10px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+.eda-boxplot-note {
+  margin: 8px 4px 0;
+  color: var(--muted);
+  font-size: 10px;
 }
 
 .eda-insights {
@@ -378,9 +453,6 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .eda-heatmap {
-    grid-template-columns: 98px repeat(var(--eda-matrix-size), minmax(52px, 1fr));
-  }
 }
 
 @media (max-width: 700px) {
@@ -430,6 +502,10 @@
     grid-template-columns: 1fr;
     gap: 9px;
   }
+
+  .eda-numeric-chart-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 420px) {
@@ -438,10 +514,6 @@
     gap: 12px;
   }
 
-  .eda-heatmap {
-    grid-template-columns: 84px repeat(var(--eda-matrix-size), minmax(45px, 1fr));
-    gap: 4px;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
