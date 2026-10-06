@@ -63,16 +63,16 @@ class PatientData(BaseModel):
     insulin: str = Field(..., example="Up")
     change: str = Field(..., example="Ch")
     diabetesMed: str = Field(..., example="Yes")
-    diag_1: Optional[str] = Field("414", example="414")
-    diag_2: Optional[str] = Field("411", example="411")
-    diag_3: Optional[str] = Field("250", example="250")
-    medical_specialty: Optional[str] = Field("Missing", example="Missing")
-    repaglinide: Optional[str] = Field("No", example="No")
-    glimepiride: Optional[str] = Field("No", example="No")
-    glipizide: Optional[str] = Field("No", example="No")
-    glyburide: Optional[str] = Field("No", example="No")
-    pioglitazone: Optional[str] = Field("No", example="No")
-    rosiglitazone: Optional[str] = Field("No", example="No")
+    diag_1: Optional[str] = None
+    diag_2: Optional[str] = None
+    diag_3: Optional[str] = None
+    medical_specialty: Optional[str] = None
+    repaglinide: Optional[str] = None
+    glimepiride: Optional[str] = None
+    glipizide: Optional[str] = None
+    glyburide: Optional[str] = None
+    pioglitazone: Optional[str] = None
+    rosiglitazone: Optional[str] = None
 
 
 # 4. Define Health Check Endpoint
@@ -90,6 +90,12 @@ EXPECTED_COLUMNS = [
     'medical_specialty', 'repaglinide', 'glimepiride', 'glipizide',
     'glyburide', 'pioglitazone', 'rosiglitazone'
 ]
+
+OPTIONAL_FIELDS = {
+    "diag_1", "diag_2", "diag_3", "medical_specialty",
+    "repaglinide", "glimepiride", "glipizide", "glyburide",
+    "pioglitazone", "rosiglitazone",
+}
 
 
 EDA_PIE_FEATURES = ["readmitted", "age", "gender", "race"]
@@ -287,7 +293,13 @@ def get_eda_summary():
 def predict_readmission(patient: PatientData):
     try:
         # Convert incoming JSON payload to Pandas DataFrame (single row)
-        input_data = pd.DataFrame([patient.dict()])
+        data = patient.dict()
+        for key in OPTIONAL_FIELDS:
+            value = data[key]
+            if isinstance(value, str) and value.strip() == "":
+                data[key] = None
+
+        input_data = pd.DataFrame([data])
 
         # 2. Automatically patch missing columns with default missing values
         for col in EXPECTED_COLUMNS:
