@@ -1,5 +1,6 @@
 import PredictionPage from './pages/PredictionPage';
 import HomePage from './pages/HomePage';
+import EDAPage from './pages/EDAPage';
 import Sidebar from './components/Sidebar';
 import { useState } from 'react';
 
@@ -12,13 +13,7 @@ function App() {
       <div className="dashboard-content">
         {activePage === 'prediction' && <PredictionPage />}
         {activePage === 'home' && <HomePage onNavigate={setActivePage} />}
-        {activePage === 'eda' && (
-          <main className="placeholder-page">
-            <p>Explore the data</p>
-            <h1>EDA</h1>
-            <span>Exploratory data analysis will be available here.</span>
-          </main>
-        )}
+        {activePage === 'eda' && <EDAPage />}
       </div>
     </div>
   );

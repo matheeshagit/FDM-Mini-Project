@@ -1,4 +1,6 @@
 from pathlib import Path
+from functools import lru_cache
+import os
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException
@@ -13,6 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent
 
 # Define path to the pipeline model file
 MODEL_PATH = BASE_DIR / "models" / "final_readmission_pipeline.joblib"
+EDA_DATA_PATH = Path(os.getenv("DIABETIC_DATA_PATH", BASE_DIR.parent.parent / "diabetic_data.csv"))
 
 # 1. Initialize FastAPI App
 app = FastAPI(
@@ -87,6 +90,137 @@ EXPECTED_COLUMNS = [
     'medical_specialty', 'repaglinide', 'glimepiride', 'glipizide',
     'glyburide', 'pioglitazone', 'rosiglitazone'
 ]
+
+
+EDA_PIE_FEATURES = ["readmitted", "age", "gender", "race"]
+EDA_TARGET_LABELS = {
+    "NO": "No readmission",
+    ">30": "Readmitted after 30 days",
+    "<30": "Readmitted within 30 days",
+}
+EDA_CORRELATION_FEATURES = [
+    "time_in_hospital",
+    "num_lab_procedures",
+    "num_medications",
+    "number_inpatient",
+    "number_diagnoses",
+]
+EDA_CORRELATION_LABELS = {
+    "time_in_hospital": "Hospital days",
+    "num_lab_procedures": "Lab procedures",
+    "num_medications": "Medications",
+    "number_inpatient": "Prior inpatient",
+    "number_diagnoses": "Diagnoses",
+}
+
+
+@lru_cache(maxsize=1)
+def build_eda_summary():
+    if not EDA_DATA_PATH.is_file():
+        raise FileNotFoundError(
+            f"EDA dataset not found at {EDA_DATA_PATH}. "
+            "Set DIABETIC_DATA_PATH to the path of diabetic_data.csv."
+        )
+
+    data = pd.read_csv(EDA_DATA_PATH, na_values="?", low_memory=False)
+    required_columns = {
+        *EDA_PIE_FEATURES,
+        *EDA_CORRELATION_FEATURES,
+    }
+    missing_columns = required_columns.difference(data.columns)
+    if missing_columns:
+        raise ValueError(
+            "EDA dataset is missing required columns: "
+            + ", ".join(sorted(missing_columns))
+        )
+
+    row_count = len(data)
+    target_counts = data["readmitted"].value_counts()
+    target = [
+        {
+            "value": value,
+            "label": EDA_TARGET_LABELS[value],
+            "count": int(target_counts.get(value, 0)),
+            "percent": round(float(target_counts.get(value, 0) / row_count * 100), 2),
+        }
+        for value in ("NO", ">30", "<30")
+    ]
+
+    features = []
+    for key in EDA_PIE_FEATURES:
+        counts = data[key].value_counts()
+        valid_count = int(counts.sum())
+        features.append({
+            "key": key,
+            "label": key,
+            "kind": "category",
+            "bins": [
+                {
+                    "label": str(value),
+                    "count": int(count),
+                    "percent": round(float(count / valid_count * 100), 2),
+                }
+                for value, count in counts.items()
+            ],
+            "stats": None,
+        })
+
+    correlations = data[EDA_CORRELATION_FEATURES].corr()
+    correlation_values = [
+        [round(float(correlations.loc[row, column]), 3) for column in EDA_CORRELATION_FEATURES]
+        for row in EDA_CORRELATION_FEATURES
+    ]
+    age_counts = data["age"].value_counts()
+    age_group, age_count = age_counts.idxmax(), int(age_counts.max())
+    inpatient_zero = int((data["number_inpatient"] == 0).sum())
+    target_early_count = int(target_counts.get("<30", 0))
+    observations = [
+        (
+            f"{target_early_count:,} encounters ({target_early_count / row_count:.1%}) "
+            "were followed by readmission within 30 days."
+        ),
+        (
+            f"The most common age group was {age_group}, "
+            f"with {age_count:,} encounters ({age_count / row_count:.1%})."
+        ),
+        (
+            f"{inpatient_zero / row_count:.1%} of encounters had no prior-year inpatient visits "
+            "(number_inpatient = 0)."
+        ),
+        (
+            "Hospital days and medication count had a positive Pearson correlation "
+            f"(r = {correlations.loc['time_in_hospital', 'num_medications']:.3f})."
+        ),
+    ]
+
+    return {
+        "source": EDA_DATA_PATH.name,
+        "overview": {
+            "records": row_count,
+            "columns": int(data.shape[1]),
+            "features": int(data.shape[1] - 1),
+            "targetClasses": len(target),
+            "missingCells": int(data.isna().to_numpy().sum()),
+        },
+        "target": target,
+        "features": features,
+        "correlations": {
+            "labels": [EDA_CORRELATION_LABELS[key] for key in EDA_CORRELATION_FEATURES],
+            "matrix": correlation_values,
+        },
+        "insights": observations,
+    }
+
+
+@app.get("/eda/summary")
+def get_eda_summary():
+    try:
+        return build_eda_summary()
+    except FileNotFoundError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+    except (ValueError, pd.errors.ParserError) as error:
+        raise HTTPException(status_code=422, detail=f"Could not analyze EDA dataset: {error}") from error
+
 
 # 5. Define Inference Endpoint
 @app.post("/predict")
