@@ -76,6 +76,12 @@ export const numericFeatures = new Set(
     .map((field) => field.name)
 );
 
+export const optionalFeatures = new Set([
+  'medical_specialty', 'diag_1', 'diag_2', 'diag_3',
+  'repaglinide', 'glimepiride', 'glipizide', 'glyburide',
+  'pioglitazone', 'rosiglitazone'
+]);
+
 export const featureNames = [
   'race', 'gender', 'age', 'admission_type_id', 'discharge_disposition_id',
   'admission_source_id', 'time_in_hospital', 'medical_specialty', 'num_lab_procedures',
