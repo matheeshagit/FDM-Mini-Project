@@ -53,7 +53,6 @@ function PredictionPage() {
 
   return (
     <div className="app-shell">
-      <Header />
       <main className="page-main">
         <div className="page-intro">
           <p className="intro-kicker">Diabetes care · Readmission risk</p>

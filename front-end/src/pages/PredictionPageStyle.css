@@ -826,7 +826,8 @@ a:focus-visible {
     }
 
     .page-intro {
-        /* margin-bottom: 4px; */
+        margin-bottom: 20px; 
+        margin-top: 25px;
     }
 
     .intro-kicker {
