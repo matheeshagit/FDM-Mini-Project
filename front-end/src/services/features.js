@@ -6,15 +6,16 @@ export const fieldGroups = [
     description: 'Basic demographic details from the encounter record.',
     fields: [
       { name: 'race', label: 'Race', type: 'select', options: options([
-        ['Caucasian', 'Caucasian'], ['AfricanAmerican', 'African American'], ['Asian', 'Asian'], ['Hispanic', 'Hispanic'], ['Other', 'Other']
+        ['Caucasian', 'Caucasian'], ['AfricanAmerican', 'AfricanAmerican'], ['Asian', 'Asian'], ['Hispanic', 'Hispanic'], ['Other', 'Other']
       ]) },
       { name: 'gender', label: 'Gender', type: 'select', options: options([
-        ['Female', 'Female'], ['Male', 'Male'], ['Unknown/Invalid', 'Unknown / invalid']
+        ['Female', 'Female'], ['Male', 'Male'], ['Unknown/Invalid', 'Unknown/Invalid']
       ]) },
       { name: 'age', label: 'Age range', type: 'select', options: options(
         Array.from({ length: 10 }, (_, index) => {
           const start = index * 10;
-          return [`[${start}-${start + 10})`, `${start} to ${start + 9} years`];
+          const ageRange = `[${start}-${start + 10})`;
+          return [ageRange, ageRange];
         })
       ) }
     ]
@@ -45,10 +46,10 @@ export const fieldGroups = [
       { name: 'diag_3', label: 'Additional diagnosis code', type: 'text', placeholder: 'Enter the recorded diagnosis code' },
       { name: 'number_diagnoses', label: 'Number of diagnoses', type: 'number', min: 1, max: 16, step: 1 },
       { name: 'max_glu_serum', label: 'Max glucose serum', type: 'select', options: options([
-        ['Norm', 'Normal'], ['>200', 'Above 200'], ['>300', 'Above 300']
+        ['None', 'None'], ['Norm', 'Norm'], ['>200', '>200'], ['>300', '>300']
       ]) },
       { name: 'A1Cresult', label: 'A1C result', type: 'select', options: options([
-        ['Norm', 'Normal'], ['>7', 'Above 7'], ['>8', 'Above 8']
+        ['None', 'None'], ['Norm', 'Norm'], ['>7', '>7'], ['>8', '>8']
       ]) }
     ]
   },
@@ -61,10 +62,10 @@ export const fieldGroups = [
         label: name.charAt(0).toUpperCase() + name.slice(1),
         type: 'select',
         options: options([
-          ['No', 'No'], ['Steady', 'Steady'], ['Up', 'Increased'], ['Down', 'Decreased']
+          ['No', 'No'], ['Steady', 'Steady'], ['Up', 'Up'], ['Down', 'Down']
         ])
       })),
-      { name: 'change', label: 'Medication changed', type: 'select', options: options([['No', 'No'], ['Ch', 'Yes']]) },
+      { name: 'change', label: 'Medication changed', type: 'select', options: options([['No', 'No'], ['Ch', 'Ch']]) },
       { name: 'diabetesMed', label: 'Diabetes medication prescribed', type: 'select', options: options([['No', 'No'], ['Yes', 'Yes']]) }
     ]
   }
